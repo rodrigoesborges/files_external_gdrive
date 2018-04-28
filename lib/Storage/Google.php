@@ -14,6 +14,7 @@
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Thomas Müller <thomas.mueller@tmit.eu>
  * @author Vincent Petry <pvince81@owncloud.com>
+ * @author Samy NASTUZZI <samy@nastuzzi.fr>
  *
  * @copyright Copyright (c) 2017, ownCloud GmbH
  * @license AGPL-3.0
@@ -38,8 +39,7 @@ use GuzzleHttp\Exception\RequestException;
 use Icewind\Streams\IteratorDirectory;
 use Icewind\Streams\RetryWrapper;
 
-class Google extends \OCP\Files\Storage\StorageAdapter {
-
+class Google extends Flysystem {
 	private $client;
 	private $id;
 	private $service;
@@ -74,8 +74,11 @@ class Google extends \OCP\Files\Storage\StorageAdapter {
 			$this->service = new \Google_Service_Drive($this->client);
 			$token = json_decode($params['token'], true);
 			$this->id = 'google::'.substr($params['client_id'], 0, 30).$token['created'];
+		} elseif (isset($params['configured']) && $params['configured'] === 'false') {
+			throw new \Exception('Google storage not yet configured');
 		} else {
-			throw new \Exception('Creating Google storage failed');
+			//throw new \Exception('Creating Google storage failed');
+			throw new \Exception('Creating Google storage failed: '.json_encode($params));
 		}
 	}
 
