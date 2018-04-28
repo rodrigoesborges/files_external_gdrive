@@ -1,6 +1,7 @@
 <?php
 /**
  * @author Vincent Petry <pvince81@owncloud.com>
+ * @author Samy NASTUZZI <samy@nastuzzi.fr>
  *
  * @copyright Copyright (c) 2017, ownCloud GmbH
  * @license AGPL-3.0
@@ -84,7 +85,7 @@ class OauthController extends Controller {
 			$client->setAccessType('offline');
 			if ($step !== null) {
 				$step = (int)$step;
-				if ($step == 1) {
+				if ($step === 1) {
 					try {
 						$authUrl = $client->createAuthUrl();
 						return new DataResponse(
@@ -103,7 +104,7 @@ class OauthController extends Controller {
 							Http::STATUS_UNPROCESSABLE_ENTITY
 						);
 					}
-				} else if ($step == 2 && $code !== null) {
+				} else if ($step === 2 && $code !== null) {
 					try {
 						$token = $client->authenticate((string)$code);
 						return new DataResponse(
@@ -133,4 +134,3 @@ class OauthController extends Controller {
 		);
 	}
 }
-
