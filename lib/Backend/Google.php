@@ -2,6 +2,7 @@
 /**
  * @author Robin McCorkell <robin@mccorkell.me.uk>
  * @author Vincent Petry <pvince81@owncloud.com>
+ * @author Samy NASTUZZI <samy@nastuzzi.fr>
  *
  * @copyright Copyright (c) 2017, ownCloud GmbH
  * @license AGPL-3.0
@@ -23,27 +24,20 @@
 namespace OCA\Files_external_gdrive\Backend;
 
 use OCP\IL10N;
-use OCP\Files\External\DefinitionParameter;
-use OCP\Files\External\Auth\AuthMechanism;
-use OCP\Files\External\Backend\Backend;
-use OCA\Files_External\Lib\LegacyDependencyCheckPolyfill;
+use OCA\Files_External\Lib\Auth\AuthMechanism;
+use OCA\Files_External\Lib\Backend\Backend;
 
 class Google extends Backend {
-
-	use LegacyDependencyCheckPolyfill;
-
 	public function __construct(IL10N $l) {
 		$this
-			->setIdentifier('googledrive')
-			->addIdentifierAlias('\OC\Files\Storage\Google') // legacy compat
+			->setIdentifier('files_external_gdrive')
+			->addIdentifierAlias('\OC\Files\External_Storage\Google') // legacy compat
 			->setStorageClass('\OCA\Files_external_gdrive\Storage\Google')
 			->setText($l->t('Google Drive'))
 			->addParameters([
 				// all parameters handled in OAuth2 mechanism
 			])
 			->addAuthScheme(AuthMechanism::SCHEME_OAUTH2)
-			->addCustomJs(['files_external_gdrive', 'gdrive'])
-		;
+			->addCustomJs('../../files_external_gdrive/js/gdrive');
 	}
-
 }

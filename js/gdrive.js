@@ -1,6 +1,6 @@
 $(document).ready(function() {
-	var backendId = 'googledrive';
-	var backendUrl = OC.generateUrl('apps/files_external_gdrive/oauth');
+	var backendId = 'files_external_gdrive';
+	var backendUrl = OC.generateUrl('apps/' + backendId + '/oauth');
 
 	function generateUrl() {
 		// no mapping between client ID and Google 'project', so we always load the same URL
@@ -27,7 +27,7 @@ $(document).ready(function() {
 
 	/**
 	 * ------- OAUTH2 Events ----------
-	 * 
+	 *
 	 * The files_external_{backendId} app's CUSTOM JS should handle the OAuth2 events itself
 	 * instead on relying on the core for the implemention. These two functions
 	 * [1] OCA.External.Settings.OAuth2.getAuthUrl, [2] OCA.External.Settings.OAuth2.verifyCode

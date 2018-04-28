@@ -1,8 +1,9 @@
 <?php
 /**
-* @author Vincent Petry <pvince81@owncloud.com>
+ * @author Vincent Petry <pvince81@owncloud.com>
+ * @author Samy NASTUZZI <samy@nastuzzi.fr>
  *
- * @copyright Copyright (c) 2017, ownCloud GmbH.
+ * @copyright Copyright (c) 2017, ownCloud GmbH
  * @license AGPL-3.0
  *
  * This code is free software: you can redistribute it and/or modify
@@ -21,12 +22,9 @@
 
 namespace OCA\Files_external_gdrive\AppInfo;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
-
+use OCA\Files_External\Lib\Config\IBackendProvider;
+use OCA\Files_External\Service\BackendService;
 use OCP\AppFramework\App;
-use OCP\AppFramework\IAppContainer;
-use OCP\IContainer;
-use OCP\Files\External\Config\IBackendProvider;
 
 /**
  * @package OCA\Files_external_gdrive\AppInfo
@@ -35,11 +33,6 @@ class Application extends App implements IBackendProvider {
 
 	public function __construct(array $urlParams = array()) {
 		parent::__construct('files_external_gdrive', $urlParams);
-
-		$container = $this->getContainer();
-
-		$backendService = $container->getServer()->getStoragesBackendService();
-		$backendService->registerBackendProvider($this);
 	}
 
 	/**
@@ -53,5 +46,15 @@ class Application extends App implements IBackendProvider {
 		];
 
 		return $backends;
+	}
+
+
+	public function register() {
+		$container = $this->getContainer();
+		$server = $container->getServer();
+
+		/** @var BackendService $backendService */
+		$backendService = $server->query('OCA\\Files_External\\Service\\BackendService');
+		$backendService->registerBackendProvider($this);
 	}
 }

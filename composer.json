@@ -1,6 +1,7 @@
 {
     "require": {
         "google/apiclient": "1.1.7",
-        "guzzlehttp/guzzle": "^5.3"
+        "guzzlehttp/guzzle": "^5.3",
+        "nao-pon/flysystem-google-drive": "~1.0.0"
     }
 }
