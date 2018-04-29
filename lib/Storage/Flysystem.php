@@ -28,6 +28,13 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 	/**
 	 * {@inheritdoc}
 	 */
+	public function file_get_contents($path) {
+		return $this->fopen($path, 'r');
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function filesize($path) {
  		$stat = $this->stat($path);
 

@@ -358,6 +358,7 @@ class Google extends Flysystem {
 	}
 
 	public function isUpdatable($path) {
+		return false; // TODO Temporary
 		$file = $this->getDriveFile($path);
 		if ($file) {
 			return $file->getEditable();
