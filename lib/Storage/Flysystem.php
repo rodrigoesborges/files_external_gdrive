@@ -25,28 +25,61 @@ use Icewind\Streams\IteratorDirectory;
 use League\Flysystem\FileNotFoundException;
 
 abstract class Flysystem extends \OC\Files\Storage\Flysystem {
-	/**
-	 * {@inheritdoc}
-	 */
-	public function file_get_contents($path) {
-		return $this->fopen($path, 'r');
+	protected $cacheFileObjects = [];
+
+    protected function buildPath($path) {
+		if ($path === '')
+			return $this->root;
+
+        $fullPath = \OC\Files\Filesystem::normalizePath($path);
+		$dirs = explode('/', substr($fullPath, 1));
+
+		@list($file, $ext) = explode('.', end($dirs));
+		unset($dirs[count($dirs) - 1]);
+
+		if (count($this->cacheFileObjects) === 0)
+			$this->cacheFileObjects = $this->flysystem->listContents('', true);
+
+		$contents = $this->cacheFileObjects;
+		$path = '';
+		$nbrSub = 0;
+
+		foreach ($dirs as $dir) {
+			$initNbr = $nbrSub;
+			foreach ($contents as $key => $content) {
+				if ($content['type'] !== 'dir')
+					continue;
+
+				if ($content['dirname'] === $path) {
+					if ($content['filename'] === $dir) {
+						$path = $content['path'];
+
+						$nbrSub++;
+						break;
+					}
+
+					unset($contents[$key]);
+				}
+				elseif (substr_count($content['dirname'], '/') <= $nbrSub)
+					unset($contents[$key]);
+			}
+
+			if ($initNbr === $nbrSub)
+				throw new FileNotFoundException(implode('/', array_slice($paths, 0, $key)));
+		}
+
+		// We now try to find the file
+		foreach ($contents as $content) {
+			if ($content['dirname'] === $path) {
+				if ($content['filename'] === $file) {
+					if ($ext && $content['extension'] !== $ext)
+						continue;
+
+					return $content['path'];
+				}
+			}
+		}
+
+		throw new FileNotFoundException($fullPath);
 	}
-
-	/**
-	 * {@inheritdoc}
-	 */
-	public function filesize($path) {
- 		$stat = $this->stat($path);
-
- 		return $stat['size'];
-	}
-
-	/**
-	 * {@inheritdoc}
-	 */
- 	public function filemtime($path) {
- 		$stat = $this->stat($path);
-
- 		return $stat['mtime'];
- 	}
 }
