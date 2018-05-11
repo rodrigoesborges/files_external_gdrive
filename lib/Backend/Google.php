@@ -31,8 +31,8 @@ class Google extends Backend {
 	public function __construct(IL10N $l) {
 		$this
 			->setIdentifier('files_external_gdrive')
-			->addIdentifierAlias('\OC\Files\External_Storage\Google') // legacy compat
-			->setStorageClass('\OCA\Files_external_gdrive\Storage\Google')
+			->addIdentifierAlias('\OC\Files\External_Storage\GoogleDrive') // legacy compat
+			->setStorageClass('\OCA\Files_external_gdrive\Storage\GoogleDrive')
 			->setText($l->t('Google Drive'))
 			->addParameters([
 				// all parameters handled in OAuth2 mechanism
