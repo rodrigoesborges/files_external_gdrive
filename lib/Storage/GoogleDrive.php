@@ -25,7 +25,6 @@ use GuzzleHttp\Exception\RequestException;
 use Icewind\Streams\IteratorDirectory;
 use Icewind\Streams\RetryWrapper;
 use Icewind\Streams\CallbackWrapper;
-use Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter;
 
 class GoogleDrive extends Flysystem {
     const APP_NAME = 'Files_external_gdrive';
@@ -87,7 +86,9 @@ class GoogleDrive extends Flysystem {
 			$token = json_decode($this->accessToken, true);
 			$this->id = 'google::'.substr($this->clientId, 0, 30).$token['created'];
 
-			$this->adapter = new GoogleDriveAdapter($this->service);
+			$this->adapter = new Adapter($this->service, [
+                'useHasDir' => true,
+            ]);
       		$this->buildFlySystem($this->adapter);
 
     		$this->logger = \OC::$server->getLogger();

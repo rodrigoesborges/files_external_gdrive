@@ -25,24 +25,23 @@ use Icewind\Streams\IteratorDirectory;
 use League\Flysystem\FileNotFoundException;
 
 abstract class Flysystem extends \OC\Files\Storage\Flysystem {
-	protected $cacheFileObjects = [];
-
     protected function buildPath($path) {
 		if ($path === '')
 			return $this->root;
 
         $fullPath = \OC\Files\Filesystem::normalizePath($path);
+
+		if ($fullPath === '')
+			return $this->root;
+
 		$dirs = explode('/', substr($fullPath, 1));
 
-		@list($file, $ext) = explode('.', end($dirs));
+		$file = end($dirs);
 		unset($dirs[count($dirs) - 1]);
 
-		if (count($this->cacheFileObjects) === 0)
-			$this->cacheFileObjects = $this->flysystem->listContents('', true);
-
-		$contents = $this->cacheFileObjects;
-		$path = '';
-		$nbrSub = 0;
+		$contents = $this->flysystem->listContents($this->root, true);
+		$path = 'root';
+		$nbrSub = 1;
 
 		foreach ($dirs as $dir) {
 			$initNbr = $nbrSub;
@@ -51,7 +50,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 					continue;
 
 				if ($content['dirname'] === $path) {
-					if ($content['filename'] === $dir) {
+					if ($content['basename'] === $dir) {
 						$path = $content['path'];
 
 						$nbrSub++;
@@ -71,7 +70,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		// We now try to find the file
 		foreach ($contents as $content) {
 			if ($content['dirname'] === $path) {
-				if ($content['filename'] === $file) {
+				if ($content['basename'] === $file) {
 					if ($ext && $content['extension'] !== $ext)
 						continue;
 
@@ -80,6 +79,6 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			}
 		}
 
-		throw new FileNotFoundException($fullPath);
+		return $fullPath;
 	}
 }
