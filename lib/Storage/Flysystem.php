@@ -21,16 +21,24 @@
 
 namespace OCA\Files_external_gdrive\Storage;
 
-use Icewind\Streams\IteratorDirectory;
 use League\Flysystem\FileNotFoundException;
 
 abstract class Flysystem extends \OC\Files\Storage\Flysystem {
-    protected function buildPath($path) {
-		if ($path === '')
+	protected $cacheFileObjects = [];
+
+	protected function getContents($force = false) {
+		if (count($this->cacheFileObjects) === 0 || $force)
+			$this->cacheFileObjects = $this->flysystem->listContents($this->root, true);
+
+		return $this->cacheFileObjects;
+	}
+
+    protected function buildPath($originalPath) {
+		if ($originalPath === '' || $originalPath === '.')
 			return $this->root;
 
-        $fullPath = \OC\Files\Filesystem::normalizePath($path);
-
+        $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
+		file_put_contents('/opt/nextcloud/test', $originalPath);
 		if ($fullPath === '')
 			return $this->root;
 
@@ -39,12 +47,13 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		$file = end($dirs);
 		unset($dirs[count($dirs) - 1]);
 
-		$contents = $this->flysystem->listContents($this->root, true);
+		$contents = $this->getContents();
 		$path = 'root';
 		$nbrSub = 1;
 
 		foreach ($dirs as $dir) {
 			$initNbr = $nbrSub;
+
 			foreach ($contents as $key => $content) {
 				if ($content['type'] !== 'dir')
 					continue;
@@ -64,7 +73,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			}
 
 			if ($initNbr === $nbrSub)
-				throw new FileNotFoundException(implode('/', array_slice($paths, 0, $key)));
+				throw new FileNotFoundException(implode('/', array_slice($dirs, 0, $key)));
 		}
 
 		// We now try to find the file
@@ -78,6 +87,9 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 				}
 			}
 		}
+
+		if ($this->getContents() != $this->getContents(true))
+			return $this->buildPath($originalPath);
 
 		return $fullPath;
 	}
