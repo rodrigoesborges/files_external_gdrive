@@ -39,6 +39,8 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 
         $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
 
+		file_put_contents('/opt/nextcloud/test', $fullPath.' // ');
+
 		if ($fullPath === '')
 			return $this->root;
 
@@ -94,6 +96,41 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		return $path.'/'.$file;
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function unlink($path) {
+		if ($this->is_dir($path))
+			return $this->rmdir($path);
+		try {
+			if ($this->flysystem->delete($path)) {
+				$this->getContents(true);
+
+				return true;
+			}
+
+			return false;
+		} catch (FileNotFoundException $e) {
+			return false;
+		}
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function rmdir($path) {
+		try {
+			if (@$this->flysystem->deleteDir($this->buildPath($path))) {
+				$this->getContents(true);
+
+				return true;
+			}
+
+			return false;
+		} catch (FileNotFoundException $e) {
+			return false;
+		}
+	}
 	/**
 	 * check if a file or folder has been updated since $time
 	 *
