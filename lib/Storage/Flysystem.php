@@ -39,8 +39,6 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 
         $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
 
-		file_put_contents('/opt/nextcloud/test', $fullPath.' // ');
-
 		if ($fullPath === '')
 			return $this->root;
 
@@ -103,7 +101,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		if ($this->is_dir($path))
 			return $this->rmdir($path);
 		try {
-			if ($this->flysystem->delete($path)) {
+			if ($this->flysystem->delete($this->buildPath($path))) {
 				$this->getContents(true);
 
 				return true;

@@ -1,12 +1,11 @@
 <?xml version="1.0"?>
 <info>
 	<id>files_external_gdrive</id>
-	<name>Google Drive external storage support</name>
-	<description>GDrive backend of external storage</description>
+	<name>Google Drive external storage support for Nextcloud</name>
+	<description>GDrive backend of external storage for Nextcloud</description>
 	<licence>AGPL</licence>
-	<author>Vincent Petry</author>
 	<author>NastuzziSamy</author>
-	<version>0.1.0</version>
+	<version>0.2.0</version>
 	<types>
 		<filesystem/>
 	</types>
