@@ -107,11 +107,15 @@ class OauthController extends Controller {
 				} else if ($step === 2 && $code !== null) {
 					try {
 						$token = $client->authenticate((string)$code);
+
+						if (isset($token['error']))
+							throw new \Exception($token['error']);
+
 						return new DataResponse(
 							[
 								'status' => 'success',
 								'data' => [
-									'token' => (string)$token
+									'token' => json_encode($token)
 								]
 							]
 						);
