@@ -38,7 +38,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			return $this->root;
 
         $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
-		file_put_contents('/opt/nextcloud/test', $originalPath);
+
 		if ($fullPath === '')
 			return $this->root;
 
@@ -91,6 +91,24 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		if ($this->getContents() != $this->getContents(true))
 			return $this->buildPath($originalPath);
 
-		return $fullPath;
+		return $path.'/'.$file;
+	}
+
+	/**
+	 * check if a file or folder has been updated since $time
+	 *
+	 * The method is only used to check if the cache needs to be updated. Storage backends that don't support checking
+	 * the mtime should always return false here. As a result storage implementations that always return false expect
+	 * exclusive access to the backend and will not pick up files that have been added in a way that circumvents
+	 * ownClouds filesystem.
+	 *
+	 * @param string $path
+	 * @param int $time
+	 * @return bool
+	 */
+	public function hasUpdated($path, $time) {
+		// TODO
+		return true;
+		return $this->filemtime($path) > $time;
 	}
 }
