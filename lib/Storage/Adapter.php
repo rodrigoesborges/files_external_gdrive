@@ -21,6 +21,9 @@
 
 namespace OCA\Files_external_gdrive\Storage;
 
+use League\Flysystem\Config;
+use League\Flysystem\Util;
+
 class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter {
 	const FOLDER = 'application/vnd.google-apps.folder';
 	const DOCUMENT = 'application/vnd.google-apps.document';
@@ -61,11 +64,79 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter {
 			case self::SPREADSHEET:
 				return 'ods';
 			case self::DRAWING:
-				return 'jpg';
+				return 'jpeg';
 			case self::PRESENTATION:
-				return 'pdf';
+				return 'odp';
 			default:
 				return '';
 		}
 	}
+
+	public function getMimeType($mimetype) {
+		// Convert Google Doc mimetypes, choosing Open Document formats for download
+		switch ($mimetype) {
+			case self::FOLDER:
+				return 'httpd/unix-directory';
+			case self::DOCUMENT:
+				return 'application/vnd.oasis.opendocument.text';
+			case self::SPREADSHEET:
+				return 'application/x-vnd.oasis.opendocument.spreadsheet';
+			case self::DRAWING:
+				return 'image/jpeg';
+			case self::PRESENTATION:
+				return 'application/vnd.oasis.opendocument.presentation';
+			default: // use extension-based detection, could be an encrypted file
+				return $mimetype;
+		}
+	}
+
+	/**
+	 * Get download url
+	 *
+	 * @param Google_Service_Drive_DriveFile $file
+	 *
+	 * @return string|false
+	 */
+	protected function getDownloadUrl($file) {
+		return 'https://www.googleapis.com/drive/v3/files/'.$file->getId().'/export?mimeType='.rawurlencode($this->getMimeType($file->mimeType));
+	}
+	
+    /**
+     * Rename a file.
+     *
+     * @param string $path
+     * @param string $newpath
+     *
+     * @return bool
+     */
+    public function rename($path, $newpath)
+    {
+        list ($oldParent, $fileId) = $this->splitPath($path);
+        list ($newParent, $newName) = $this->splitPath($newpath);
+
+		$mimetype = $this->getGoogleDocExtension($this->getMimetype($fileId)['mimetype']);
+
+		if ($mimetype !== '' && end(explode('.', $newName)) === $mimetype)
+			$newName = substr($newName, 0, - strlen($mimetype) - 1);
+
+        $file = new \Google_Service_Drive_DriveFile();
+        $file->setName($newName);
+        $opts = [
+            'fields' => $this->fetchfieldsGet
+        ];
+        if ($newParent !== $oldParent) {
+            $opts['addParents'] = $newParent;
+            $opts['removeParents'] = $oldParent;
+        }
+
+        $updatedFile = $this->service->files->update($fileId, $file, $this->applyDefaultParams($opts, 'files.update'));
+
+        if ($updatedFile) {
+            $this->cacheFileObjects[$updatedFile->getId()] = $updatedFile;
+            $this->cacheFileObjects[$newName] = $updatedFile;
+            return true;
+        }
+
+        return false;
+    }
 }
