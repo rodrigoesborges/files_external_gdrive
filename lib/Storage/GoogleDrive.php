@@ -28,7 +28,7 @@ use Icewind\Streams\CallbackWrapper;
 
 class GoogleDrive extends Flysystem {
     const APP_NAME = 'Files_external_gdrive';
-
+    
     protected $config = [
         'retry' => [
             'retries' => 5
@@ -99,5 +99,19 @@ class GoogleDrive extends Flysystem {
 
 	public function getId() {
 		return $this->id;
+	}
+
+	public function free_space($path) {
+        $about = $this->service->about->get(['fields' => 'storageQuota']);
+        $storageQuota = $about->getStorageQuota();
+
+        return $storageQuota->getLimit() - $storageQuota->getUsage();
+	}
+
+	public function test() {
+		if ($this->free_space('')) {
+			return true;
+		}
+		return false;
 	}
 }
