@@ -33,7 +33,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		return $this->cacheFileObjects;
 	}
 
-    protected function buildPath($originalPath) {
+    protected function buildPath($originalPath, $reloadContents = false) {
 		if ($originalPath === '' || $originalPath === '.')
 			return $this->root;
 
@@ -47,7 +47,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		$file = end($dirs);
 		unset($dirs[count($dirs) - 1]);
 
-		$contents = $this->getContents();
+		$contents = $this->getContents($reloadContents);
 		$path = 'root';
 		$nbrSub = 1;
 
@@ -88,8 +88,8 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			}
 		}
 
-		if ($this->getContents() != $this->getContents(true))
-			return $this->buildPath($originalPath);
+		if (!$reloadContents)
+			return $this->buildPath($originalPath, true);
 
 		return $path.'/'.$file;
 	}

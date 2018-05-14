@@ -1,12 +1,12 @@
 # Files External Google Drive (Nextcloud app)
-  Google Drive external storage support for Nextcloud
+  Google Drive external storage support for Nextcloud (still in Beta)
 
 # TODOs
 - [x] Make files and directories:
     - [x] Printable
     - [x] Readable
     - [x] Downloadable
-    - [ ] Uploadable
+    - [x] Uploadable
     - [x] Editable
     - [x] Renamable
     - [x] With the right mimetype
@@ -18,6 +18,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.1
+- Make the app compliant
+- Be warn the app is still in beta version until v1.0.0
+
 ### v0.2.0
 - Add test function
 - Force Nextcloud to update all directories contents
