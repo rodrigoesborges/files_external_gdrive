@@ -85,8 +85,8 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter {
 				return 'image/jpeg';
 			case self::PRESENTATION:
 				return 'application/vnd.oasis.opendocument.presentation';
-			default: // use extension-based detection, could be an encrypted file
-				return $mimetype;
+			default:
+				return parent::getMimetype($mimetype);
 		}
 	}
 
@@ -98,9 +98,40 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter {
 	 * @return string|false
 	 */
 	protected function getDownloadUrl($file) {
-		return 'https://www.googleapis.com/drive/v3/files/'.$file->getId().'/export?mimeType='.rawurlencode($this->getMimeType($file->mimeType));
+		$mimetype = $file->mimeType;
+
+		if (!$export = $this->getMimeType($mimetype))
+			return 'https://www.googleapis.com/drive/v3/files/'.$file->getId().'?alt=media';
+		else
+			return 'https://www.googleapis.com/drive/v3/files/'.$file->getId().'/export?mimeType='.rawurlencode($export);
 	}
-	
+
+    /**
+     * Read a file as a stream.
+     *
+     * @param string $path
+     *
+     * @return array|false
+     */
+	public function readStream($path) {
+		try {
+			$file = $this->getFileObject($path);
+			$mimetype = $this->getMimeType($file->mimeType);
+
+			if ($mimetype)
+				$response = $this->service->files->export($file->getId(), $mimetype, ['alt' => 'downloadable']);
+			else
+				$response = $this->service->files->get($file->getId(), ['alt' => 'media']);
+
+			return [
+				'stream' => $response->getBody()->getContents()
+			];
+		}
+		catch (\Exception $e) {
+			return false;
+		}
+	}
+
     /**
      * Rename a file.
      *

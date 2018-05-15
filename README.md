@@ -18,6 +18,11 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.2
+- Bugs fixed:
+    - Files were all time exported (and sometimes, in an incompatible format) https://github.com/NastuzziSamy/files_external_gdrive/issues/3
+    - Files were not downloaded correctly (files streams were badly requested)
+
 ### v0.2.1
 - Make the app compliant
 - Be warn the app is still in beta version until v1.0.0

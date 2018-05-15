@@ -79,12 +79,8 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		// We now try to find the file
 		foreach ($contents as $content) {
 			if ($content['dirname'] === $path) {
-				if ($content['basename'] === $file) {
-					if ($ext && $content['extension'] !== $ext)
-						continue;
-
+				if ($content['basename'] === $file)
 					return $content['path'];
-				}
 			}
 		}
 
