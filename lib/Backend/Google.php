@@ -38,6 +38,6 @@ class Google extends Backend {
 				// all parameters handled in OAuth2 mechanism
 			])
 			->addAuthScheme(AuthMechanism::SCHEME_OAUTH2)
-			->addCustomJs('../../files_external_gdrive/js/gdrive');
+			->addCustomJs('/files_external_gdrive/js/gdrive');
 	}
 }
