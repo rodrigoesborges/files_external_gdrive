@@ -5,7 +5,7 @@
 	<description>GDrive backend of external storage for Nextcloud</description>
 	<licence>AGPL</licence>
 	<author>NastuzziSamy</author>
-	<version>0.2.2</version>
+	<version>0.2.3</version>
 	<types>
 		<filesystem/>
 	</types>

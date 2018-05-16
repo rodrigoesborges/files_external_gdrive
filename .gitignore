@@ -2,3 +2,6 @@ tests/config.json
 tests/clover.xml
 vendor
 \.*
+
+# packaged app
+build/artifacts

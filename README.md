@@ -18,6 +18,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.3
+- Bugs fixed:
+    - It was impossible to install the app from the appstore (Makefile missing..) https://github.com/NastuzziSamy/files_external_gdrive/issues/1
+
 ### v0.2.2
 - Bugs fixed:
     - Files were all time exported (and sometimes, in an incompatible format) https://github.com/NastuzziSamy/files_external_gdrive/issues/3
