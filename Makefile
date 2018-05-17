@@ -20,6 +20,9 @@ clean:
 composer.phar:
 	curl -sS https://getcomposer.org/installer | php
 
+.PHONY: install
+install: clean install-deps
+
 .PHONY: install-deps
 install-deps: install-composer-deps-dev
 

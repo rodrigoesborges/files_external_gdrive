@@ -1,6 +1,15 @@
 # Files External Google Drive (Nextcloud app)
   Google Drive external storage support for Nextcloud (still in Beta)
 
+# installation
+## From the appstore
+- Simply install `files_external_gdrive` from the Nextcloud appstore
+
+## From git
+- First, clone the repo `git clone https://github.com/NastuzziSamy/files_external_gdrive.git`
+- Execute `make install` in the app directory
+- And enable the app with `php occ app:enable files_external` in the Nextcloud directory
+
 # TODOs
 - [x] Make files and directories:
     - [x] Printable
@@ -18,6 +27,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.4
+- Add installation procedure
+- Improve the appinfo.xml file
+
 ### v0.2.3
 - Bugs fixed:
     - It was impossible to install the app from the appstore (Makefile missing..) https://github.com/NastuzziSamy/files_external_gdrive/issues/1

@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>files_external_gdrive</id>
 	<name>Google Drive external storage support for Nextcloud</name>
+	<summary>GDrive backend of external storage for Nextcloud</summary>
 	<description>GDrive backend of external storage for Nextcloud</description>
 	<licence>AGPL</licence>
-	<author>NastuzziSamy</author>
-	<version>0.2.3</version>
-	<types>
-		<filesystem/>
-	</types>
-
+	<author mail="samy@nastuzzi.fr" homepage="https://github.com/NastuzziSamy/files_external_gdrive.git">NASTUZZI Samy</author>
+	<version>0.2.4</version>
+    <category>files</category>
+	<category>tools</category>
 	<namespace>Files_external_gdrive</namespace>
 	<dependencies>
-		<nextcloud min-version="13" max-version="14"/>
+		<nextcloud min-version="13" max-version="15"/>
 	</dependencies>
 	<website>https://github.com/NastuzziSamy/files_external_gdrive/</website>
 	<bugs>https://github.com/NastuzziSamy/files_external_gdrive/issues</bugs>
