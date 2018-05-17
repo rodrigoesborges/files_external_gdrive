@@ -5,3 +5,4 @@ vendor
 
 # packaged app
 build/artifacts
+composer.phar

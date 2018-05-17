@@ -46,38 +46,25 @@ update-composer: composer.phar
 appstore: clean install-deps
 	mkdir -p $(sign_dir)
 	rsync -a \
-	--exclude=bower.json \
-	--exclude=.bowerrc \
+	--exclude=.* \
 	--exclude=/build \
 	--exclude=composer.json \
 	--exclude=composer.lock \
 	--exclude=composer.phar \
 	--exclude=CONTRIBUTING.md \
 	--exclude=coverage \
-	--exclude=.git \
-	--exclude=.gitattributes \
-	--exclude=.github \
-	--exclude=.gitignore \
 	--exclude=Gruntfile.js \
-	--exclude=.hg \
 	--exclude=issue_template.md \
-	--exclude=.jscsrc \
-	--exclude=.jshintignore \
-	--exclude=.jshintrc \
 	--exclude=js/tests \
 	--exclude=karma.conf.js \
 	--exclude=l10n/no-php \
-	--exclude=.tx \
 	--exclude=Makefile \
 	--exclude=nbproject \
 	--exclude=/node_modules \
 	--exclude=package.json \
-	--exclude=.phan \
 	--exclude=phpunit*xml \
 	--exclude=screenshots \
-	--exclude=.scrutinizer.yml \
 	--exclude=tests \
-	--exclude=.travis.yml \
 	--exclude=vendor/bin \
 	$(project_dir)/ $(sign_dir)/$(app_name)
 	@if [ -f $(cert_dir)/$(app_name).key ]; then \
@@ -91,5 +78,6 @@ appstore: clean install-deps
 		-C $(sign_dir) $(app_name)
 	@if [ -f $(cert_dir)/$(app_name).key ]; then \
 		echo "Signing package…"; \
-		openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64; \
+		openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64 > $(build_dir)/sign.b64; \
+		cat $(build_dir)/sign.b64; \
 fi

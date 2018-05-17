@@ -8,7 +8,7 @@
 ## From git
 - First, clone the repo `git clone https://github.com/NastuzziSamy/files_external_gdrive.git`
 - Execute `make install` in the app directory
-- And enable the app with `php occ app:enable files_external` in the Nextcloud directory
+- And enable the app with `php occ app:enable files_external_gdrive` in the Nextcloud directory
 
 # TODOs
 - [x] Make files and directories:
@@ -27,6 +27,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.5
+- Bug fixed:
+    - Add vendor directory in the nextcloud app https://github.com/NastuzziSamy/files_external_gdrive/issues/1
+
 ### v0.2.4
 - Add installation procedure
 - Improve the appinfo.xml file
