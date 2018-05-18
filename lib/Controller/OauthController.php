@@ -77,10 +77,12 @@ class OauthController extends Controller {
 		$clientSecret = $client_secret;
 		if ($clientId !== null && $clientSecret !== null && $redirect !== null) {
 			$client = new \Google_Client();
-			$client->setClientId((string)$clientId);
-			$client->setClientSecret((string)$clientSecret);
-			$client->setRedirectUri((string)$redirect);
-			$client->setScopes(['https://www.googleapis.com/auth/drive']);
+			$client->setClientId($clientId);
+			$client->setClientSecret($clientSecret);
+			$client->setRedirectUri($redirect);
+			$client->setScopes([
+		        \Google_Service_Drive::DRIVE,
+		    ]);
 			$client->setApprovalPrompt('force');
 			$client->setAccessType('offline');
 			if ($step !== null) {
@@ -106,10 +108,16 @@ class OauthController extends Controller {
 					}
 				} else if ($step === 2 && $code !== null) {
 					try {
-						$token = $client->authenticate((string)$code);
+						$token = $client->authenticate($code);
 
-						if (isset($token['error']))
-							throw new \Exception($token['error']);
+						if (isset($token['error'])) {
+							return new DataResponse(
+								[
+									'data' => $token
+								],
+								Http::STATUS_BAD_REQUEST
+							);
+						}
 
 						return new DataResponse(
 							[

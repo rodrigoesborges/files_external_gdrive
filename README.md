@@ -27,6 +27,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.6
+- Bug fixed:
+    - Correct Oauth2 grant bug https://github.com/NastuzziSamy/files_external_gdrive/issues/4
+
 ### v0.2.5
 - Bug fixed:
     - Add vendor directory in the nextcloud app https://github.com/NastuzziSamy/files_external_gdrive/issues/1
