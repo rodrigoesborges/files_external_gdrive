@@ -28,8 +28,10 @@
 
 # Changelogs
 ### v0.2.6
-- Bug fixed:
+- Bugs fixed:
     - Correct Oauth2 grant bug https://github.com/NastuzziSamy/files_external_gdrive/issues/4
+    - Storage was all time "temporarily not available" https://github.com/NastuzziSamy/files_external_gdrive/issues/5
+    - Building path did not work correctly with root
 
 ### v0.2.5
 - Bug fixed:

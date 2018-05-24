@@ -22,6 +22,8 @@
 namespace OCA\Files_external_gdrive\Storage;
 
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Plugin\GetWithMetadata;
 
 abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 	protected $cacheFileObjects = [];
@@ -33,8 +35,13 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		return $this->cacheFileObjects;
 	}
 
+	protected function buildFlySystem($adapter) {
+		$this->flysystem = new Filesystem($adapter);
+		$this->flysystem->addPlugin(new GetWithMetadata());
+	}
+
     protected function buildPath($originalPath, $reloadContents = false) {
-		if ($originalPath === '' || $originalPath === '.')
+		if ($originalPath === '' || $originalPath === '.' || $originalPath === $this->root)
 			return $this->root;
 
         $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
