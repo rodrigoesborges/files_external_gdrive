@@ -28,19 +28,19 @@ use League\Flysystem\Plugin\GetWithMetadata;
 abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 	protected $cacheFileObjects = [];
 
-	protected function getContents($force = false) {
-		if (count($this->cacheFileObjects) === 0 || $force)
+	protected function getContents() {
+		if (count($this->cacheFileObjects) === 0)
 			$this->cacheFileObjects = $this->flysystem->listContents($this->root, true);
 
 		return $this->cacheFileObjects;
 	}
 
-	protected function buildFlySystem($adapter) {
+	protected function buildFlySystem(\League\Flysystem\AdapterInterface $adapter) {
 		$this->flysystem = new Filesystem($adapter);
 		$this->flysystem->addPlugin(new GetWithMetadata());
 	}
 
-    protected function buildPath($originalPath, $reloadContents = false) {
+    protected function buildPath($originalPath) {
 		if ($originalPath === '' || $originalPath === '.' || $originalPath === $this->root)
 			return $this->root;
 
@@ -54,7 +54,9 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 		$file = end($dirs);
 		unset($dirs[count($dirs) - 1]);
 
-		$contents = $this->getContents($reloadContents);
+
+		$canReload = (count($this->cacheFileObjects) > 0);
+		$contents = $this->getContents();
 		$path = 'root';
 		$nbrSub = 1;
 
@@ -91,8 +93,10 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			}
 		}
 
-		if (!$reloadContents)
-			return $this->buildPath($originalPath, true);
+		if ($canReload) {
+			$this->cacheFileObjects = [];
+			return $this->buildPath($originalPath);
+		}
 
 		return $path.'/'.$file;
 	}
@@ -105,7 +109,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 			return $this->rmdir($path);
 		try {
 			if ($this->flysystem->delete($this->buildPath($path))) {
-				$this->getContents(true);
+				$this->cacheFileObjects = [];
 
 				return true;
 			}
@@ -122,7 +126,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem {
 	public function rmdir($path) {
 		try {
 			if (@$this->flysystem->deleteDir($this->buildPath($path))) {
-				$this->getContents(true);
+				$this->cacheFileObjects = [];
 
 				return true;
 			}

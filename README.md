@@ -27,6 +27,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.7
+- Bug fixed:
+    - In certain php version, some functions returned errors
+
 ### v0.2.6
 - Bugs fixed:
     - Correct Oauth2 grant bug https://github.com/NastuzziSamy/files_external_gdrive/issues/4
