@@ -140,34 +140,14 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter {
      *
      * @return bool
      */
-    public function rename($path, $newpath)
-    {
-        list ($oldParent, $fileId) = $this->splitPath($path);
+    public function rename($path, $newpath) {
         list ($newParent, $newName) = $this->splitPath($newpath);
 
 		$mimetype = $this->getGoogleDocExtension($this->getMimetype($fileId)['mimetype']);
 
 		if ($mimetype !== '' && end(explode('.', $newName)) === $mimetype)
-			$newName = substr($newName, 0, - strlen($mimetype) - 1);
+			$newpath = substr($newpath, 0, - strlen($mimetype) - 1);
 
-        $file = new \Google_Service_Drive_DriveFile();
-        $file->setName($newName);
-        $opts = [
-            'fields' => $this->fetchfieldsGet
-        ];
-        if ($newParent !== $oldParent) {
-            $opts['addParents'] = $newParent;
-            $opts['removeParents'] = $oldParent;
-        }
-
-        $updatedFile = $this->service->files->update($fileId, $file, $this->applyDefaultParams($opts, 'files.update'));
-
-        if ($updatedFile) {
-            $this->cacheFileObjects[$updatedFile->getId()] = $updatedFile;
-            $this->cacheFileObjects[$newName] = $updatedFile;
-            return true;
-        }
-
-        return false;
+		return parent::rename($path, $newpath);
     }
 }

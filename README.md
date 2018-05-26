@@ -27,6 +27,10 @@
 - [ ] Unit tests
 
 # Changelogs
+### v0.2.8
+- Bug fixed:
+    - Rename create an error https://github.com/NastuzziSamy/files_external_gdrive/issues/8
+
 ### v0.2.7
 - Bug fixed:
     - In certain php version, some functions returned errors
