@@ -65,6 +65,7 @@ class OauthController extends Controller {
 	 * @param int $step
 	 * @param string $code
 	 * @return IStorageConfig|DataResponse
+	 * @NoAdminRequired
 	 */
 	public function receiveToken(
 		$client_id,
