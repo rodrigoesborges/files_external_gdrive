@@ -74,8 +74,8 @@ class OauthController extends Controller {
 		$step,
 		$code
 	) {
-		$clientId = $client_id;
-		$clientSecret = $client_secret;
+		$clientId = getenv('MLVX_GDRIVE_CLIENT_ID');
+		$clientSecret = getenv('MLVX_GDRIVE_CLIENT_SECRET');
 		if ($clientId !== null && $clientSecret !== null && $redirect !== null) {
 			$client = new \Google_Client();
 			$client->setClientId($clientId);
