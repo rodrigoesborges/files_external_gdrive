@@ -106,6 +106,9 @@ OCA.External.Settings.OAuth2 = OCA.External.Settings.OAuth2 || {};
  * @param  {Object}   data       Keys -> (backend_id, client_id, client_secret, redirect, tr)
  */
 OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
+	$('.configuration [data-parameter="client_id"]').val("dummy_id");
+	$('.configuration [data-parameter="client_secret"]').val("dummy_secret");
+
 	var $tr = data['tr'];
 	var configured = $tr.find('[data-parameter="configured"]');
 	var token = $tr.find('.configuration [data-parameter="token"]');
@@ -148,6 +151,9 @@ OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
  * @return {Promise} jQuery Deferred Promise object
  */
 OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
+	$('.configuration [data-parameter="client_id"]').val("dummy_id");
+	$('.configuration [data-parameter="client_secret"]').val("dummy_secret");
+
 	var $tr = data['tr'];
 	var configured = $tr.find('[data-parameter="configured"]');
 	var token = $tr.find('.configuration [data-parameter="token"]');
