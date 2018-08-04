@@ -149,8 +149,8 @@ class OauthController extends Controller {
 
 	public function handleSave($id) {
 		$data = file_get_contents('php://input');
-		str_replace("dummy_id", getenv('MLVX_GDRIVE_CLIENT_ID'),$data);
-		str_replace("dummy_secret", getenv('MLVX_GDRIVE_CLIENT_SECRET'),$data);
+		$data = str_replace("dummy_id", getenv('MLVX_GDRIVE_CLIENT_ID'),$data);
+		$data = str_replace("dummy_secret", getenv('MLVX_GDRIVE_CLIENT_SECRET'),$data);
 
 		$domain = $_SERVER['HTTP_HOST'];
 		$prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';

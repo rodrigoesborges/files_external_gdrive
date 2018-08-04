@@ -195,7 +195,7 @@ function saveStorageConfig ($tr, callback, concurrentTimer) {
 			return false;
 		}
 
-	OCA.External.Settings.mountConfig.updateStatus($tr, StorageConfig.Status.IN_PROGRESS);
+	OCA.External.Settings.mountConfig.updateStatus($tr, -1);
 	saveConfig(storage,{
 			success: function(result) {
 				if (concurrentTimer === undefined
@@ -213,24 +213,25 @@ function saveStorageConfig ($tr, callback, concurrentTimer) {
 				if (concurrentTimer === undefined
 					|| $tr.data('save-timer') === concurrentTimer
 				) {
-					OCA.External.Settings.mountConfig.updateStatus($tr, StorageConfig.Status.ERROR);
+					OCA.External.Settings.mountConfig.updateStatus($tr, 1);
 				}
 			}
 		});
 }
 
 function saveConfig (config, options){
-	var url = OC.generateUrl(config._url);
+	var configUrl = config._url.replace("files_external", "files_external_gdrive");
+	var url = OC.generateUrl(configUrl);
 	var method = 'POST';
-	if (_.isNumber($config.id)) {
-		url = OC.generateUrl(config._url + '/{id}', {id: config.id});
+	if (_.isNumber(config.id)) {
+		url = OC.generateUrl(configUrl + '/{id}', {id: config.id});
 	}
 
 	$.ajax({
 		type: method,
 		url: url,
 		contentType: 'application/json',
-		data: JSON.stringify($config.getData()),
+		data: JSON.stringify(config.getData()),
 		success: function(result) {
 			self.id = result.id;
 			if (_.isFunction(options.success)) {
