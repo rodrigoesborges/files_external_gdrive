@@ -168,27 +168,8 @@ class OauthController extends Controller {
 		$data = str_replace("dummy_id", getenv('MLVX_GDRIVE_CLIENT_ID'),$data);
 		$data = str_replace("dummy_secret", getenv('MLVX_GDRIVE_CLIENT_SECRET'),$data);
 
-		/*
-		$domain = $_SERVER['HTTP_HOST'];
-		$prefix = $_SERVER['HTTPS'] ? 'https://' : 'http://';
-		$relative = "/index.php/apps/files_external/userstorages/" . $id;
-		$req = curl_init();
-		curl_setopt_array($req, [
-			CURLOPT_URL            => $prefix.$domain.$relative,
-			CURLOPT_CUSTOMREQUEST  => "PUT",
-			CURLOPT_POSTFIELDS     => json_encode($data),
-			CURLOPT_HTTPHEADER     => getallheaders(),
-			CURLOPT_RETURNTRANSFER => true,
-		]);
-
-		curl_exec($req);
-
-		$result = curl_close($req);
-
-		echo $result;*/
-
 		$decodedData = json_decode($data, true);
-		return $this->userStoragesController->create($decodedData['mountPoint'],$decodedData['backend'],$decodedData['authMechanism'],$decodedData['backendOptions'],$decodedData['mountOptions']);
+		return $this->userStoragesController->update($decodedData['id'],$decodedData['mountPoint'],$decodedData['backend'],$decodedData['authMechanism'],$decodedData['backendOptions'],$decodedData['mountOptions']);
 	}
 
 }
