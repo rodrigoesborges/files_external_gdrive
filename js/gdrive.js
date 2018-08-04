@@ -123,7 +123,7 @@ OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
 				$(configured).val('false');
 				$(token).val('false');
 
-				OCA.External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
+				saveStorageConfig($tr, function (status) {
 					if (!result.data.url) {
 						OC.dialogs.alert('Auth URL not set',
 							t('files_external', 'No URL provided by backend ' + data['backend_id'])
@@ -232,28 +232,6 @@ function saveConfig (config, options){
 		url: url,
 		contentType: 'application/json',
 		data: JSON.stringify(config.getData()),
-		success: function(result) {
-			self.id = result.id;
-			if (_.isFunction(options.success)) {
-				options.success(result);
-			}
-		},
-		error: options.error
-	});
-}
-OCA.External.Settings.UserStorageConfig.save = function(options) {
-	var self = this;
-	var url = OC.generateUrl(this._url);
-	var method = 'POST';
-	if (_.isNumber(this.id)) {
-		url = OC.generateUrl(this._url + '/{id}', {id: this.id});
-	}
-
-	$.ajax({
-		type: method,
-		url: url,
-		contentType: 'application/json',
-		data: JSON.stringify(this.getData()),
 		success: function(result) {
 			self.id = result.id;
 			if (_.isFunction(options.success)) {
