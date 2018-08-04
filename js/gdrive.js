@@ -233,7 +233,7 @@ function saveConfig (config, options){
 		contentType: 'application/json',
 		data: JSON.stringify(config.getData()),
 		success: function(result) {
-			self.id = result.id;
+			config.id = result.id;
 			if (_.isFunction(options.success)) {
 				options.success(result);
 			}
