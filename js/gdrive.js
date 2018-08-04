@@ -188,3 +188,26 @@ OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
 	);
 	return deferredObject.promise();
 };
+
+OCA.External.Settings.StorageConfig.save = function(options) {
+	var self = this;
+	var url = OC.generateUrl(this._url);
+	var method = 'POST';
+	if (_.isNumber(this.id)) {
+		url = OC.generateUrl(this._url + '/{id}', {id: this.id});
+	}
+
+	$.ajax({
+		type: method,
+		url: url,
+		contentType: 'application/json',
+		data: JSON.stringify(this.getData()),
+		success: function(result) {
+			self.id = result.id;
+			if (_.isFunction(options.success)) {
+				options.success(result);
+			}
+		},
+		error: options.error
+	});
+}
