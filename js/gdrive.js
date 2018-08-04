@@ -123,7 +123,7 @@ OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
 				$(configured).val('false');
 				$(token).val('false');
 
-				saveStorageConfig($tr, function (status) {
+				OCA.External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
 					if (!result.data.url) {
 						OC.dialogs.alert('Auth URL not set',
 							t('files_external', 'No URL provided by backend ' + data['backend_id'])
