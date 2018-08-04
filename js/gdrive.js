@@ -173,7 +173,7 @@ OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
 				$(token).val(result.data.token);
 				$(configured).val('true');
 
-				OCA.External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
+				saveStorageConfig($tr, function (status) {
 					if (status) {
 						$tr.find('.configuration input.auth-param')
 							.attr('disabled', 'disabled')
@@ -189,7 +189,58 @@ OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
 	return deferredObject.promise();
 };
 
-OCA.External.Settings.StorageConfig.save = function(options) {
+function saveStorageConfig ($tr, callback, concurrentTimer) {
+		var storage = OCA.External.Settings.mountConfig.getStorageConfig($tr);
+		if (!storage || !storage.validate()) {
+			return false;
+		}
+
+	OCA.External.Settings.mountConfig.updateStatus($tr, StorageConfig.Status.IN_PROGRESS);
+	saveConfig(storage,{
+			success: function(result) {
+				if (concurrentTimer === undefined
+					|| $tr.data('save-timer') === concurrentTimer
+				) {
+					OCA.External.Settings.mountConfig.updateStatus($tr, result.status);
+					$tr.data('id', result.id);
+
+					if (_.isFunction(callback)) {
+						callback(storage);
+					}
+				}
+			},
+			error: function() {
+				if (concurrentTimer === undefined
+					|| $tr.data('save-timer') === concurrentTimer
+				) {
+					OCA.External.Settings.mountConfig.updateStatus($tr, StorageConfig.Status.ERROR);
+				}
+			}
+		});
+}
+
+function saveConfig (config, options){
+	var url = OC.generateUrl(config._url);
+	var method = 'POST';
+	if (_.isNumber($config.id)) {
+		url = OC.generateUrl(config._url + '/{id}', {id: config.id});
+	}
+
+	$.ajax({
+		type: method,
+		url: url,
+		contentType: 'application/json',
+		data: JSON.stringify($config.getData()),
+		success: function(result) {
+			self.id = result.id;
+			if (_.isFunction(options.success)) {
+				options.success(result);
+			}
+		},
+		error: options.error
+	});
+}
+OCA.External.Settings.UserStorageConfig.save = function(options) {
 	var self = this;
 	var url = OC.generateUrl(this._url);
 	var method = 'POST';
