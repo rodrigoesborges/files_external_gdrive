@@ -66,18 +66,9 @@ appstore: clean install-deps
 	--exclude=screenshots \
 	--exclude=tests \
 	--exclude=vendor/bin \
-	$(project_dir)/ $(sign_dir)/$(app_name)
-	@if [ -f $(cert_dir)/$(app_name).key ]; then \
-		echo "Signing app files…"; \
-		php ../../occ integrity:sign-app \
-			--privateKey=$(cert_dir)/$(app_name).key\
-			--certificate=$(cert_dir)/$(app_name).crt\
-			--path=$(sign_dir)/$(app_name); \
-	fi
+	$(project_dir) $(sign_dir)
 	tar -czf $(build_dir)/$(app_name).tar.gz \
-		-C $(sign_dir) $(app_name)
-	@if [ -f $(cert_dir)/$(app_name).key ]; then \
-		echo "Signing package…"; \
-		openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64 > $(build_dir)/sign.b64; \
-		cat $(build_dir)/sign.b64; \
-fi
+	   -C $(sign_dir) $(app_name)
+	openssl dgst -sha512 -sign $(cert_dir)/$(app_name).key $(build_dir)/$(app_name).tar.gz | openssl base64 > $(build_dir)/$(app_name).b64
+	rm -rf $(build_dir)/artifacts
+	cat $(build_dir)/$(app_name).b64 \
