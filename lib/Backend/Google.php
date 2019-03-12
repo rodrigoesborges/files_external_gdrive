@@ -29,6 +29,7 @@ use OCA\Files_External\Lib\Backend\Backend;
 
 class Google extends Backend {
 	public function __construct(IL10N $l) {
+		$appWebPath = \OC_App::getAppWebPath('files_external_gdrive');
 		$this
 			->setIdentifier('files_external_gdrive')
 			->addIdentifierAlias('\OC\Files\External_Storage\GoogleDrive') // legacy compat
@@ -38,6 +39,6 @@ class Google extends Backend {
 				// all parameters handled in OAuth2 mechanism
 			])
 			->addAuthScheme(AuthMechanism::SCHEME_OAUTH2)
-			->addCustomJs('../../files_external_gdrive/js/gdrive');
+			->addCustomJs("../../../$appWebPath/js/gdrive");
 	}
 }
