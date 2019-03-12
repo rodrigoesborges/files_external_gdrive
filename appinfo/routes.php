@@ -20,9 +20,11 @@
  *
  */
 
-$application = new \OCA\Files_external_gdrive\AppInfo\Application();
-$application->registerRoutes($this, [
-	'routes' => [
-		['name' => 'oauth#receiveToken', 'url' => '/oauth', 'verb' => 'POST'],
-	],
-]);
+if (\OC::$server->getAppManager()->isEnabledForUser('files_external')) {
+    $application = new \OCA\Files_external_gdrive\AppInfo\Application();
+    $application->registerRoutes($this, [
+    	'routes' => [
+    		['name' => 'oauth#receiveToken', 'url' => '/oauth', 'verb' => 'POST'],
+    	],
+    ]);
+}
