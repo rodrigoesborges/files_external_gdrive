@@ -1,6 +1,14 @@
 # Changelogs
 ## v0.3.0
--
+- Add Changelog file
+- Refractor JS namespaces to follow stable 15
+- Add guideline
+- Supports for Nextcloud 15 and 16
+- Normal user can use the app if allowed by an admin
+- Bugs fixed:
+    - Random OAuth2 errors: trim all inputs to avoid bad copy/paste from Google Developer Console
+    - The "Grant access" button worked randomly: https://github.com/NastuzziSamy/files_external_gdrive/issues/28
+    - Cannot create gdrive from command line: https://github.com/NastuzziSamy/files_external_gdrive/issues/40
 
 ## v0.2.8
 - Bug fixed:

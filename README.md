@@ -39,9 +39,9 @@ Use your Google credentials to authorize access and connect to your Google accou
     - [x] Editable
     - [x] Renamable
     - [x] With the right mimetype
-- [ ] Allow regular user to create its own Google Drive external storage
+- [x] Allow regular user to create its own Google Drive external storage
+- [x] Fix Oauth duplications
 - [ ] Print better stats
 - [ ] Update only on changes
 - [ ] Optimize
-- [ ] Fix Oauth duplications
 - [ ] Unit tests
