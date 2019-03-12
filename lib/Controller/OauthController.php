@@ -73,12 +73,10 @@ class OauthController extends Controller {
 		$step,
 		$code
 	) {
-		$clientId = $client_id;
-		$clientSecret = $client_secret;
-		if ($clientId !== null && $clientSecret !== null && $redirect !== null) {
+		if ($client_id !== null && $client_secret !== null && $redirect !== null) {
 			$client = new \Google_Client();
-			$client->setClientId($clientId);
-			$client->setClientSecret($clientSecret);
+			$client->setClientId($client_id);
+			$client->setClientSecret($client_secret);
 			$client->setRedirectUri($redirect);
 			$client->setScopes([
 		        \Google_Service_Drive::DRIVE,
@@ -99,6 +97,7 @@ class OauthController extends Controller {
 					} catch (Exception $exception) {
 						return new DataResponse(
 							[
+                                'status' => 'error',
 								'data' => [
 									'message' => $l->t('Step 1 failed. Exception: %s', [$exception->getMessage()])
 								]
@@ -113,6 +112,7 @@ class OauthController extends Controller {
 						if (isset($token['error'])) {
 							return new DataResponse(
 								[
+                                    'status' => 'error',
 									'data' => $token
 								],
 								Http::STATUS_BAD_REQUEST
@@ -130,6 +130,7 @@ class OauthController extends Controller {
 					} catch (Exception $exception) {
 						return new DataResponse(
 							[
+                                'status' => 'error',
 								'data' => [
 									'message' => $l->t('Step 2 failed. Exception: %s', [$exception->getMessage()])
 								]
@@ -141,7 +142,10 @@ class OauthController extends Controller {
 			}
 		}
 		return new DataResponse(
-			[],
+			[
+                'status' => 'error',
+                'data' => [],
+            ],
 			Http::STATUS_BAD_REQUEST
 		);
 	}
