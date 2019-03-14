@@ -114,7 +114,7 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem
         }
 
         try {
-            if ($this->flysystem->delete($this->buildPath($path))) {
+            if (@$this->flysystem->delete($this->buildPath($path))) {
                 $this->cacheFileObjects = [];
 
                 return true;
