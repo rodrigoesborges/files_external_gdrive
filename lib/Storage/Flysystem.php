@@ -32,16 +32,10 @@ abstract class Flysystem extends \OC\Files\Storage\Flysystem
     protected function getContents()
     {
         if (count($this->cacheFileObjects) === 0) {
-            $this->cacheFileObjects = $this->flysystem->listContents($this->root, true);
+            $this->cacheFileObjects = $this->flysystem->listContents($this->root);
         }
 
         return $this->cacheFileObjects;
-    }
-
-    protected function buildFlySystem(\League\Flysystem\AdapterInterface $adapter)
-    {
-        $this->flysystem = new Filesystem($adapter);
-        $this->flysystem->addPlugin(new GetWithMetadata());
     }
 
     protected function buildPath($originalPath)

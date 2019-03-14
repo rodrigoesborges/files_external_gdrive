@@ -28,11 +28,11 @@ use Icewind\Streams\CallbackWrapper;
 
 class GoogleDrive extends Flysystem
 {
-    const APP_NAME = 'Files_external_gdrive';
+    const APP_NAME = 'files_external_gdrive';
 
     protected $config = [
         'retry' => [
-            'retries' => 5,
+            'retries' => 1,
         ],
     ];
     protected $scopes = [
@@ -91,6 +91,15 @@ class GoogleDrive extends Flysystem
             $this->id = 'google::'.substr($this->clientId, 0, 30).$token['created'];
 
             $this->adapter = new Adapter($this->service);
+            // $this->adapter = new Adapter($this->service, [
+            //     'defaultParams' => [
+            //         'files.list' => [
+            //             'includeTeamDriveItems' => true,
+            //         ],
+            //     ]
+            // ]);
+            // $this->adapter->enableTeamDriveSupport();
+
             $this->buildFlySystem($this->adapter);
 
             $this->logger = \OC::$server->getLogger();

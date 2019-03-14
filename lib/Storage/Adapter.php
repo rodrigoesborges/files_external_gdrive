@@ -33,6 +33,8 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter
     const PRESENTATION = 'application/vnd.google-apps.presentation';
     const MAP = 'application/vnd.google-apps.map';
 
+    protected $cachedContents = [];
+
     /**
      * List contents of a directory.
      *
@@ -43,15 +45,27 @@ class Adapter extends \Hypweb\Flysystem\GoogleDrive\GoogleDriveAdapter
      */
     public function listContents($path='', $recursive=false)
     {
+        if (isset($this->cachedContents[$path])) {
+            return $this->cachedContents[$path];
+        }
+
         $contents = $this->getItems($path, $recursive);
+
+        \file_put_contents(str_replace('/', '-', $path).'.json', \json_encode($contents));
 
         foreach ($contents as $key => $content) {
             $extension = isset($content['mimetype']) ? $this->getGoogleDocExtension($content['mimetype']) : '';
 
-            $contents[$key]['basename'] = $content['filename'].($content['extension'] === '' ? '' : '.'.$content['extension']).($extension === '' ? '' : '.'.$extension);
+            $contents[$key]['basename'] = $content['filename'];
+
+            if ($content['extension']) {
+                $contents[$key]['basename'] .= '.'.$content['extension'];
+            } elseif ($extension) {
+                $contents[$key]['basename'] .= '.'.$extension;
+            }
         }
 
-        return $contents;
+        return $this->cachedContents[$path] = $contents;
     }
 
     /**
