@@ -1,4 +1,11 @@
 # Changelogs
+## v0.4.0
+- Stabilize the application: no more crashes, no more infinite loadings
+- Consequence: nothing works with subfolders contents
+- Bugs fixed:
+    - Guzzle conflicted with the News app one: https://github.com/NastuzziSamy/files_external_gdrive/issues/27
+    - Deleting a file created a whole crash
+
 ## v0.3.0
 - Add Changelog file
 - Refractor JS namespaces to follow stable 15
