@@ -29,32 +29,34 @@ use OCP\AppFramework\App;
 /**
  * @package OCA\Files_external_gdrive\AppInfo
  */
-class Application extends App implements IBackendProvider {
+class Application extends App implements IBackendProvider
+{
+    public function __construct(array $urlParams=[])
+    {
+        parent::__construct('files_external_gdrive', $urlParams);
+    }
 
-	public function __construct(array $urlParams = array()) {
-		parent::__construct('files_external_gdrive', $urlParams);
-	}
+    /**
+     * @{inheritdoc}
+     */
+    public function getBackends()
+    {
+        $container = $this->getContainer();
 
-	/**
-	 * @{inheritdoc}
-	 */
-	public function getBackends() {
-		$container = $this->getContainer();
+        $backends = [
+            $container->query('OCA\Files_external_gdrive\Backend\Google'),
+        ];
 
-		$backends = [
-			$container->query('OCA\Files_external_gdrive\Backend\Google'),
-		];
+        return $backends;
+    }
 
-		return $backends;
-	}
+    public function register()
+    {
+        $container = $this->getContainer();
+        $server = $container->getServer();
 
-
-	public function register() {
-		$container = $this->getContainer();
-		$server = $container->getServer();
-
-		/** @var BackendService $backendService */
-		$backendService = $server->query('OCA\\Files_External\\Service\\BackendService');
-		$backendService->registerBackendProvider($this);
-	}
+        // @var BackendService $backendService
+        $backendService = $server->query('OCA\\Files_External\\Service\\BackendService');
+        $backendService->registerBackendProvider($this);
+    }
 }

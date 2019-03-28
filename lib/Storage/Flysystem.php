@@ -25,132 +25,141 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Plugin\GetWithMetadata;
 
-abstract class Flysystem extends \OC\Files\Storage\Flysystem {
-	protected $cacheFileObjects = [];
+abstract class Flysystem extends \OC\Files\Storage\Flysystem
+{
+    protected $cacheFileObjects = [];
 
-	protected function getContents() {
-		if (count($this->cacheFileObjects) === 0)
-			$this->cacheFileObjects = $this->flysystem->listContents($this->root, true);
+    protected function getContents()
+    {
+        if (count($this->cacheFileObjects) === 0) {
+            $this->cacheFileObjects = $this->flysystem->listContents($this->root);
+        }
 
-		return $this->cacheFileObjects;
-	}
+        return $this->cacheFileObjects;
+    }
 
-	protected function buildFlySystem(\League\Flysystem\AdapterInterface $adapter) {
-		$this->flysystem = new Filesystem($adapter);
-		$this->flysystem->addPlugin(new GetWithMetadata());
-	}
-
-    protected function buildPath($originalPath) {
-		if ($originalPath === '' || $originalPath === '.' || $originalPath === $this->root)
-			return $this->root;
+    protected function buildPath($originalPath)
+    {
+        if ($originalPath === '' || $originalPath === '.' || $originalPath === $this->root) {
+            return $this->root;
+        }
 
         $fullPath = \OC\Files\Filesystem::normalizePath($originalPath);
 
-		if ($fullPath === '')
-			return $this->root;
+        if ($fullPath === '') {
+            return $this->root;
+        }
 
-		$dirs = explode('/', substr($fullPath, 1));
+        $dirs = explode('/', substr($fullPath, 1));
 
-		$file = end($dirs);
-		unset($dirs[count($dirs) - 1]);
+        $file = end($dirs);
+        unset($dirs[(count($dirs) - 1)]);
 
+        $canReload = (count($this->cacheFileObjects) > 0);
+        $contents = $this->getContents();
+        $path = 'root';
+        $nbrSub = 1;
 
-		$canReload = (count($this->cacheFileObjects) > 0);
-		$contents = $this->getContents();
-		$path = 'root';
-		$nbrSub = 1;
+        foreach ($dirs as $dir) {
+            $initNbr = $nbrSub;
 
-		foreach ($dirs as $dir) {
-			$initNbr = $nbrSub;
+            foreach ($contents as $key => $content) {
+                if ($content['type'] !== 'dir') {
+                    continue;
+                }
 
-			foreach ($contents as $key => $content) {
-				if ($content['type'] !== 'dir')
-					continue;
+                if ($content['dirname'] === $path) {
+                    if ($content['basename'] === $dir) {
+                        $path = $content['path'];
 
-				if ($content['dirname'] === $path) {
-					if ($content['basename'] === $dir) {
-						$path = $content['path'];
+                        $nbrSub++;
+                        break;
+                    }
 
-						$nbrSub++;
-						break;
-					}
+                    unset($contents[$key]);
+                } else if (substr_count($content['dirname'], '/') <= $nbrSub) {
+                    unset($contents[$key]);
+                }
+            }
 
-					unset($contents[$key]);
-				}
-				elseif (substr_count($content['dirname'], '/') <= $nbrSub)
-					unset($contents[$key]);
-			}
+            if ($initNbr === $nbrSub) {
+                throw new FileNotFoundException(implode('/', array_slice($dirs, 0, $key)));
+            }
+        }
 
-			if ($initNbr === $nbrSub)
-				throw new FileNotFoundException(implode('/', array_slice($dirs, 0, $key)));
-		}
+        // We now try to find the file
+        foreach ($contents as $content) {
+            if ($content['dirname'] === $path) {
+                if ($content['basename'] === $file) {
+                    return $content['path'];
+                }
+            }
+        }
 
-		// We now try to find the file
-		foreach ($contents as $content) {
-			if ($content['dirname'] === $path) {
-				if ($content['basename'] === $file)
-					return $content['path'];
-			}
-		}
+        if ($canReload) {
+            $this->cacheFileObjects = [];
+            return $this->buildPath($originalPath);
+        }
 
-		if ($canReload) {
-			$this->cacheFileObjects = [];
-			return $this->buildPath($originalPath);
-		}
+        return $path.'/'.$file;
+    }
 
-		return $path.'/'.$file;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function unlink($path)
+    {
+        if ($this->is_dir($path)) {
+            return $this->rmdir($path);
+        }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function unlink($path) {
-		if ($this->is_dir($path))
-			return $this->rmdir($path);
-		try {
-			if ($this->flysystem->delete($this->buildPath($path))) {
-				$this->cacheFileObjects = [];
+        try {
+            if (@$this->flysystem->delete($this->buildPath($path))) {
+                $this->cacheFileObjects = [];
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		} catch (FileNotFoundException $e) {
-			return false;
-		}
-	}
+            return false;
+        } catch (FileNotFoundException $e) {
+            return false;
+        }
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function rmdir($path) {
-		try {
-			if (@$this->flysystem->deleteDir($this->buildPath($path))) {
-				$this->cacheFileObjects = [];
+    /**
+     * {@inheritdoc}
+     */
+    public function rmdir($path)
+    {
+        try {
+            if (@$this->flysystem->deleteDir($this->buildPath($path))) {
+                $this->cacheFileObjects = [];
 
-				return true;
-			}
+                return true;
+            }
 
-			return false;
-		} catch (FileNotFoundException $e) {
-			return false;
-		}
-	}
-	/**
-	 * check if a file or folder has been updated since $time
-	 *
-	 * The method is only used to check if the cache needs to be updated. Storage backends that don't support checking
-	 * the mtime should always return false here. As a result storage implementations that always return false expect
-	 * exclusive access to the backend and will not pick up files that have been added in a way that circumvents
-	 * ownClouds filesystem.
-	 *
-	 * @param string $path
-	 * @param int $time
-	 * @return bool
-	 */
-	public function hasUpdated($path, $time) {
-		// TODO
-		return true;
-		return $this->filemtime($path) > $time;
-	}
+            return false;
+        } catch (FileNotFoundException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * check if a file or folder has been updated since $time
+     *
+     * The method is only used to check if the cache needs to be updated. Storage backends that don't support checking
+     * the mtime should always return false here. As a result storage implementations that always return false expect
+     * exclusive access to the backend and will not pick up files that have been added in a way that circumvents
+     * ownClouds filesystem.
+     *
+     * @param string  $path
+     * @param integer $time
+     * @return boolean
+     */
+    public function hasUpdated($path, $time)
+    {
+        // TODO
+        return true;
+        return $this->filemtime($path) > $time;
+    }
 }

@@ -32,118 +32,117 @@ use OCP\IRequest;
 /**
  * Oauth controller for GDrive
  */
-class OauthController extends Controller {
-	/**
-	 * L10N service
-	 *
-	 * @var IL10N
-	 */
-	protected $l10n;
+class OauthController extends Controller
+{
+    /**
+     * L10N service
+     *
+     * @var IL10N
+     */
+    protected $l10n;
 
-	/**
-	 * Creates a new storages controller.
-	 *
-	 * @param string $AppName application name
-	 * @param IRequest $request request
-	 * @param IL10N $l10n l10n service
-	 */
-	public function __construct(
-		$AppName,
-		IRequest $request,
-		IL10N $l10n
-	) {
-		parent::__construct($AppName, $request);
-		$this->l10n = $l10n;
-	}
+    /**
+     * Creates a new storages controller.
+     *
+     * @param string   $AppName application name
+     * @param IRequest $request request
+     * @param IL10N    $l10n    l10n service
+     */
+    public function __construct($AppName, IRequest $request, IL10N $l10n)
+    {
+        parent::__construct($AppName, $request);
+        $this->l10n = $l10n;
+    }
 
-	/**
-	 * Create a storage from its parameters
-	 *
-	 * @param string $client_id
-	 * @param string $client_secret
-	 * @param string $redirect
-	 * @param int $step
-	 * @param string $code
-	 * @return IStorageConfig|DataResponse
-	 * @NoAdminRequired
-	 */
-	public function receiveToken(
-		$client_id,
-		$client_secret,
-		$redirect,
-		$step,
-		$code
-	) {
-		$clientId = $client_id;
-		$clientSecret = $client_secret;
-		if ($clientId !== null && $clientSecret !== null && $redirect !== null) {
-			$client = new \Google_Client();
-			$client->setClientId($clientId);
-			$client->setClientSecret($clientSecret);
-			$client->setRedirectUri($redirect);
-			$client->setScopes([
-		        \Google_Service_Drive::DRIVE,
-		    ]);
-			$client->setApprovalPrompt('force');
-			$client->setAccessType('offline');
-			if ($step !== null) {
-				$step = (int)$step;
-				if ($step === 1) {
-					try {
-						$authUrl = $client->createAuthUrl();
-						return new DataResponse(
-							[
-								'status' => 'success',
-								'data' => ['url' => $authUrl]
-							]
-						);
-					} catch (Exception $exception) {
-						return new DataResponse(
-							[
-								'data' => [
-									'message' => $l->t('Step 1 failed. Exception: %s', [$exception->getMessage()])
-								]
-							],
-							Http::STATUS_UNPROCESSABLE_ENTITY
-						);
-					}
-				} else if ($step === 2 && $code !== null) {
-					try {
-						$token = $client->authenticate($code);
+    /**
+     * Create a storage from its parameters
+     *
+     * @param string  $client_id
+     * @param string  $client_secret
+     * @param string  $redirect
+     * @param integer $step
+     * @param string  $code
+     * @return IStorageConfig|DataResponse
+     */
+    public function receiveToken($client_id, $client_secret, $redirect, $step, $code)
+    {
+        if ($client_id !== null && $client_secret !== null && $redirect !== null) {
+            $client = new \Google_Client();
+            $client->setClientId($client_id);
+            $client->setClientSecret($client_secret);
+            $client->setRedirectUri($redirect);
+            $client->setScopes([
+                \Google_Service_Drive::DRIVE,
+            ]);
+            $client->setApprovalPrompt('force');
+            $client->setAccessType('offline');
+            if ($step !== null) {
+                   $step = (int) $step;
+                if ($step === 1) {
+                    try {
+                        $authUrl = $client->createAuthUrl();
+                        return new DataResponse(
+                             [
+                                 'status' => 'success',
+                                 'data' => [
+                                     'url' => $authUrl
+                                 ]
+                             ]
+                         );
+                    } catch (Exception $exception) {
+                        return new DataResponse(
+                            [
+                                'status' => 'error',
+                                'data' => [
+                                    'message' => $l->t('Step 1 failed. Exception: %s', [$exception->getMessage()]),
+                                ]
+                            ],
+                            Http::STATUS_UNPROCESSABLE_ENTITY
+                        );
+                    }
+                } else if ($step === 2 && $code !== null) {
+                    try {
+                        $token = $client->authenticate($code);
 
-						if (isset($token['error'])) {
-							return new DataResponse(
-								[
-									'data' => $token
-								],
-								Http::STATUS_BAD_REQUEST
-							);
-						}
+                        if (isset($token['error'])) {
+                            return new DataResponse(
+                                [
+                                    'status' => 'error',
+                                    'data' => $token
+                                ],
+                                Http::STATUS_BAD_REQUEST
+                            );
+                        }
 
-						return new DataResponse(
-							[
-								'status' => 'success',
-								'data' => [
-									'token' => json_encode($token)
-								]
-							]
-						);
-					} catch (Exception $exception) {
-						return new DataResponse(
-							[
-								'data' => [
-									'message' => $l->t('Step 2 failed. Exception: %s', [$exception->getMessage()])
-								]
-							],
-							Http::STATUS_UNPROCESSABLE_ENTITY
-						);
-					}
-				}
-			}
-		}
-		return new DataResponse(
-			[],
-			Http::STATUS_BAD_REQUEST
-		);
-	}
+                        return new DataResponse(
+                            [
+                                'status' => 'success',
+                                'data' => [
+                                    'token' => json_encode($token),
+                                ]
+                            ]
+                        );
+                    } catch (Exception $exception) {
+                        return new DataResponse(
+                             [
+                                 'status' => 'error',
+                                 'data' => [
+                                     'message' => $l->t('Step 2 failed. Exception: %s', [$exception->getMessage()]),
+                                 ]
+                             ],
+                             Http::STATUS_UNPROCESSABLE_ENTITY
+                        );
+                    }
+                }
+            }
+        }
+
+        return new DataResponse(
+            [
+                'status' => 'error',
+                'data' => [],
+            ],
+            Http::STATUS_BAD_REQUEST
+        );
+    }
 }

@@ -6,7 +6,7 @@ $(document).ready(function () {
 		$tr.find('.configuration input.auth-param').attr('disabled', 'disabled').addClass('disabled-success');
 	}
 
-	OCA.External.Settings.mountConfig.whenSelectAuthMechanism(function ($tr, authMechanism, scheme, onCompletion) {
+	OCA.Files_External.Settings.mountConfig.whenSelectAuthMechanism(function ($tr, authMechanism, scheme, onCompletion) {
 		if (authMechanism === 'oauth2::oauth2') {
 			var config = $tr.find('.configuration');
 			// hack to prevent conflict with oauth2 code from files_external
@@ -21,8 +21,8 @@ $(document).ready(function () {
 				if ($(configured).val() == 'true') {
 					displayGranted($tr);
 				} else {
-					var client_id = $tr.find('.configuration [data-parameter="client_id"]').val();
-					var client_secret = $tr.find('.configuration [data-parameter="client_secret"]').val();
+					var client_id = $tr.find('.configuration [data-parameter="client_id"]').val().trim();
+					var client_secret = $tr.find('.configuration [data-parameter="client_secret"]').val().trim();
 
 					var params = {};
 					window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function (m, key, value) {
@@ -54,8 +54,8 @@ $(document).ready(function () {
 	$('#externalStorage').on('click', '[name="oauth2_grant_gdrive"]', function (event) {
 		event.preventDefault();
 		var tr = $(this).parent().parent();
-		var client_id = $(this).parent().find('[data-parameter="client_id"]').val();
-		var client_secret = $(this).parent().find('[data-parameter="client_secret"]').val();
+		var client_id = $(this).parent().find('[data-parameter="client_id"]').val().trim();
+		var client_secret = $(this).parent().find('[data-parameter="client_secret"]').val().trim();
 		if (client_id !== '' && client_secret !== '') {
 			$('.configuration').trigger('oauth_step1', [{
 				backend_id: tr.attr('class'),
@@ -68,13 +68,11 @@ $(document).ready(function () {
 	});
 
 	$('.configuration').on('oauth_step1', function (event, data) {
-		console.log('b', data);
-
 		if (data['backend_id'] !== backendId) {
 			return false;	// means the trigger is not for this storage adapter
 		}
 
-		OCA.External.Settings.OAuth2.getAuthUrl(backendUrl, data);
+		OCA.Files_External.Settings.OAuth2.getAuthUrl(backendUrl, data);
 	});
 
 	$('.configuration').on('oauth_step2', function (event, data) {
@@ -82,7 +80,7 @@ $(document).ready(function () {
 			return false;		// means the trigger is not for this OAuth2 grant
 		}
 
-		OCA.External.Settings.OAuth2.verifyCode(backendUrl, data)
+		OCA.Files_External.Settings.OAuth2.verifyCode(backendUrl, data)
 			.fail(function (message) {
 				OC.dialogs.alert(message,
 					t(backendId, 'Error verifying OAuth2 Code for ' + backendId)
@@ -95,7 +93,7 @@ $(document).ready(function () {
  * @namespace OAuth2 namespace which is used to verify a storage adapter
  *            using AuthMechanism as oauth2::oauth2
  */
-OCA.External.Settings.OAuth2 = OCA.External.Settings.OAuth2 || {};
+OCA.Files_External.Settings.OAuth2 = OCA.Files_External.Settings.OAuth2 || {};
 
 /**
  * This function sends a request to the given backendUrl and gets the OAuth2 URL
@@ -105,7 +103,7 @@ OCA.External.Settings.OAuth2 = OCA.External.Settings.OAuth2 || {};
  * @param  {String}   backendUrl The backend URL to which request will be sent
  * @param  {Object}   data       Keys -> (backend_id, client_id, client_secret, redirect, tr)
  */
-OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
+OCA.Files_External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
 	var $tr = data['tr'];
 	var configured = $tr.find('[data-parameter="configured"]');
 	var token = $tr.find('.configuration [data-parameter="token"]');
@@ -120,7 +118,7 @@ OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
 				$(configured).val('false');
 				$(token).val('false');
 
-				OCA.External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
+				OCA.Files_External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
 					if (!result.data.url) {
 						OC.dialogs.alert('Auth URL not set',
 							t('files_external', 'No URL provided by backend ' + data['backend_id'])
@@ -147,7 +145,7 @@ OCA.External.Settings.OAuth2.getAuthUrl = function (backendUrl, data) {
  * @param  {Object}   data       Keys -> (backend_id, client_id, client_secret, redirect, tr, code)
  * @return {Promise} jQuery Deferred Promise object
  */
-OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
+OCA.Files_External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
 	var $tr = data['tr'];
 	var configured = $tr.find('[data-parameter="configured"]');
 	var token = $tr.find('.configuration [data-parameter="token"]');
@@ -167,7 +165,7 @@ OCA.External.Settings.OAuth2.verifyCode = function (backendUrl, data) {
 				$(token).val(result.data.token);
 				$(configured).val('true');
 
-				OCA.External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
+				OCA.Files_External.Settings.mountConfig.saveStorageConfig($tr, function (status) {
 					if (status) {
 						$tr.find('.configuration input.auth-param')
 							.attr('disabled', 'disabled')
